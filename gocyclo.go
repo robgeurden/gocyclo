@@ -201,7 +201,7 @@ func recvString(recv ast.Expr) string {
 
 // complexity calculates the cyclomatic complexity of a function.
 func complexity(fn *ast.FuncDecl, fset *token.FileSet) int {
-	v := complexityVisitor{Complexity:0, fset:fset}
+	v := complexityVisitor{Complexity:0, fSet:fset}
 	ast.Walk(&v, fn)
 	return v.Complexity
 }
