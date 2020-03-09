@@ -19,10 +19,12 @@
 package main
 
 import (
+	"bytes"
 	"flag"
 	"fmt"
 	"go/ast"
 	"go/parser"
+	"go/printer"
 	"go/token"
 	"io"
 	"log"
@@ -216,9 +218,11 @@ type complexityVisitor struct {
 func (v *complexityVisitor) Visit(n ast.Node) ast.Visitor {
 	switch n := n.(type) {
 	case *ast.IfStmt:
-		fmt.Println(v.fSet.Position(n.Cond.Pos()).Line)
+		var buf bytes.Buffer
+		printer.Fprint(&buf, v.fSet, n.Cond)
+		fmt.Println(buf)
 		v.Complexity++
-	case *ast.FuncDecl , *ast.ForStmt, *ast.RangeStmt, *ast.CaseClause, *ast.CommClause:
+	case *ast.FuncDecl, *ast.ForStmt, *ast.RangeStmt, *ast.CaseClause, *ast.CommClause:
 		v.Complexity++
 	case *ast.BinaryExpr:
 		if n.Op == token.LAND || n.Op == token.LOR {
