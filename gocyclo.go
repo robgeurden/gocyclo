@@ -228,8 +228,9 @@ func (v *complexityVisitor) Visit(n ast.Node) ast.Visitor {
 			y := buf.String()
 			if x != "err"{
 				v.Complexity++
+			} else {
+				fmt.Println("x:", x, ", y:", y)
 			}
-			fmt.Println(x, y)
 		default:
 			v.Complexity++
 		}
