@@ -14,6 +14,7 @@
 //      -top N    show the top N most complex functions only
 //      -avg      show the average complexity
 //	    -noerror  ignore if err != nil when calculating complexity
+//		-novendor ignore vendor packages
 //
 // The output fields for each line are:
 // <complexity> <package> <function> <file:row:column>
@@ -23,6 +24,7 @@ import (
 	"bytes"
 	"flag"
 	"fmt"
+	"github.com/ahmetb/go-linq"
 	"go/ast"
 	"go/parser"
 	"go/printer"
@@ -46,6 +48,7 @@ Flags:
         -avg      show the average complexity over all functions,
                   not depending on whether -over or -top are set
         -noerror  ignore if err != nil when calculating complexity
+        -novendor  ignore if err != nil when calculating complexity
 
 The output fields for each line are:
 <complexity> <package> <function> <file:row:column>
@@ -61,6 +64,7 @@ var (
 	top  = flag.Int("top", -1, "show the top N most complex functions only")
 	avg  = flag.Bool("avg", false, "show the average complexity")
 	noerror = flag.Bool("noerror", false, "ignore if err != nil when calculating complexity")
+	novendor = flag.Bool("novendor", false, "ignore vendor packages")
 )
 
 func main() {
@@ -123,6 +127,11 @@ func analyzeDir(dirname string, stats []stat) []stat {
 }
 
 func writeStats(w io.Writer, sortedStats []stat) int {
+	//remove all vendor files when no vendor flag is set
+	if *novendor {
+		 linq.From(sortedStats).WhereT(func(s stat) bool {return !strings.Contains(s.FuncName, "vendor")}).ToSlice(&sortedStats)
+	}
+
 	for i, stat := range sortedStats {
 		if i == *top {
 			return i
