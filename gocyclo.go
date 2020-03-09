@@ -220,7 +220,7 @@ func (v *complexityVisitor) Visit(n ast.Node) ast.Visitor {
 	case *ast.IfStmt:
 		var buf bytes.Buffer
 		printer.Fprint(&buf, v.fSet, n.Cond)
-		fmt.Println(buf)
+		fmt.Println(buf.String())
 		v.Complexity++
 	case *ast.FuncDecl, *ast.ForStmt, *ast.RangeStmt, *ast.CaseClause, *ast.CommClause:
 		v.Complexity++
