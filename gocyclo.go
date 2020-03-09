@@ -218,10 +218,20 @@ type complexityVisitor struct {
 func (v *complexityVisitor) Visit(n ast.Node) ast.Visitor {
 	switch n := n.(type) {
 	case *ast.IfStmt:
-		var buf bytes.Buffer
-		printer.Fprint(&buf, v.fSet, n.Cond)
-		fmt.Println(buf.String())
-		v.Complexity++
+		switch e := n.Cond.(type) {
+		case *ast.BinaryExpr:
+			var buf bytes.Buffer
+			printer.Fprint(&buf, v.fSet, e.X)
+			x := buf.String()
+			printer.Fprint(&buf, v.fSet, e.Y)
+			y := buf.String()
+			if x != "err"{
+				v.Complexity++
+			}
+			fmt.Println(x, y)
+		default:
+			v.Complexity++
+		}
 	case *ast.FuncDecl, *ast.ForStmt, *ast.RangeStmt, *ast.CaseClause, *ast.CommClause:
 		v.Complexity++
 	case *ast.BinaryExpr:
