@@ -250,7 +250,6 @@ func (v *complexityVisitor) isErrorCheck(n *ast.IfStmt) bool {
 	y := buf.String()
 
 	if x == "err" && y == "nil" {
-		fmt.Println("ignored nil check line: ", v.fSet.Position(n.Cond.Pos()))
 		return true
 	}
 	return false
