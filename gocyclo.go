@@ -216,7 +216,7 @@ type complexityVisitor struct {
 func (v *complexityVisitor) Visit(n ast.Node) ast.Visitor {
 	switch n := n.(type) {
 	case *ast.IfStmt:
-		fmt.Println(v.fset.Position(n.Cond.Pos()).Line)
+		fmt.Println(v.fSet.Position(n.Cond.Pos()).Line)
 		v.Complexity++
 	case *ast.FuncDecl , *ast.ForStmt, *ast.RangeStmt, *ast.CaseClause, *ast.CommClause:
 		v.Complexity++
