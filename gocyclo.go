@@ -50,7 +50,7 @@ The output fields for each line are:
 `
 
 func usage() {
-	fmt.Fprintf(os.Stderr, usageDoc)
+	_, _ = fmt.Fprintf(os.Stderr, usageDoc)
 	os.Exit(2)
 }
 
@@ -58,6 +58,7 @@ var (
 	over = flag.Int("over", 0, "show functions with complexity > N only")
 	top  = flag.Int("top", -1, "show the top N most complex functions only")
 	avg  = flag.Bool("avg", false, "show the average complexity")
+	noerror = flag.Bool("noError", false, "ignore if err != nil when calculating complexity")
 )
 
 func main() {
@@ -110,7 +111,7 @@ func analyzeFile(fname string, stats []stat) []stat {
 }
 
 func analyzeDir(dirname string, stats []stat) []stat {
-	filepath.Walk(dirname, func(path string, info os.FileInfo, err error) error {
+	_ = filepath.Walk(dirname, func(path string, info os.FileInfo, err error) error {
 		if err == nil && !info.IsDir() && strings.HasSuffix(path, ".go") {
 			stats = analyzeFile(path, stats)
 		}
@@ -127,7 +128,7 @@ func writeStats(w io.Writer, sortedStats []stat) int {
 		if stat.Complexity <= *over {
 			return i
 		}
-		fmt.Fprintln(w, stat)
+		_, _ = fmt.Fprintln(w, stat)
 	}
 	return len(sortedStats)
 }
@@ -218,20 +219,7 @@ type complexityVisitor struct {
 func (v *complexityVisitor) Visit(n ast.Node) ast.Visitor {
 	switch n := n.(type) {
 	case *ast.IfStmt:
-		switch e := n.Cond.(type) {
-		case *ast.BinaryExpr:
-			var buf bytes.Buffer
-			printer.Fprint(&buf, v.fSet, e.X)
-			x := buf.String()
-			buf.Reset()
-			printer.Fprint(&buf, v.fSet, e.Y)
-			y := buf.String()
-			if x != "err"{
-				v.Complexity++
-			} else {
-				fmt.Println("x:", x, ", y:", y)
-			}
-		default:
+		if !(*noerror) || !v.isErrorCheck(n) {
 			v.Complexity++
 		}
 	case *ast.FuncDecl, *ast.ForStmt, *ast.RangeStmt, *ast.CaseClause, *ast.CommClause:
@@ -242,4 +230,26 @@ func (v *complexityVisitor) Visit(n ast.Node) ast.Visitor {
 		}
 	}
 	return v
+}
+
+func (v *complexityVisitor) isErrorCheck(n *ast.IfStmt) bool {
+	e, isBinary := n.Cond.(*ast.BinaryExpr)
+	if !isBinary {
+		return false
+	}
+
+	var buf bytes.Buffer
+	_ = printer.Fprint(&buf, v.fSet, e.X)
+	x := buf.String()
+
+	buf.Reset()
+
+	_ = printer.Fprint(&buf, v.fSet, e.Y)
+	y := buf.String()
+
+	if x == "err" && y == "nil" {
+		fmt.Println("ignored nil check line: ", v.fSet.Position(n.Cond.Pos()))
+		return true
+	}
+	return false
 }
