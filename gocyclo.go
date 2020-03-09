@@ -13,6 +13,7 @@
 //                return exit code 1 if the output is non-empty
 //      -top N    show the top N most complex functions only
 //      -avg      show the average complexity
+//	    -noerror  ignore if err != nil when calculating complexity
 //
 // The output fields for each line are:
 // <complexity> <package> <function> <file:row:column>
@@ -44,6 +45,7 @@ Flags:
         -top N    show the top N most complex functions only
         -avg      show the average complexity over all functions,
                   not depending on whether -over or -top are set
+		-noerror  ignore if err != nil when calculating complexity
 
 The output fields for each line are:
 <complexity> <package> <function> <file:row:column>
