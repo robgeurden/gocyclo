@@ -167,7 +167,7 @@ func buildStats(f *ast.File, fset *token.FileSet, stats []stat) []stat {
 			stats = append(stats, stat{
 				PkgName:    f.Name.Name,
 				FuncName:   funcName(fn),
-				Complexity: complexity(fn),
+				Complexity: complexity(fn, fset),
 				Pos:        fset.Position(fn.Pos()),
 			})
 		}
@@ -200,8 +200,8 @@ func recvString(recv ast.Expr) string {
 }
 
 // complexity calculates the cyclomatic complexity of a function.
-func complexity(fn *ast.FuncDecl) int {
-	v := complexityVisitor{}
+func complexity(fn *ast.FuncDecl, fset *token.FileSet) int {
+	v := complexityVisitor{Complexity:0, fset:fset}
 	ast.Walk(&v, fn)
 	return v.Complexity
 }
@@ -209,12 +209,16 @@ func complexity(fn *ast.FuncDecl) int {
 type complexityVisitor struct {
 	// Complexity is the cyclomatic complexity
 	Complexity int
+	fSet *token.FileSet
 }
 
 // Visit implements the ast.Visitor interface.
 func (v *complexityVisitor) Visit(n ast.Node) ast.Visitor {
 	switch n := n.(type) {
-	case *ast.FuncDecl, *ast.IfStmt, *ast.ForStmt, *ast.RangeStmt, *ast.CaseClause, *ast.CommClause:
+	case *ast.IfStmt:
+		fmt.Println(v.fset.Position(n.Cond.Pos()).Line)
+		v.Complexity++
+	case *ast.FuncDecl , *ast.ForStmt, *ast.RangeStmt, *ast.CaseClause, *ast.CommClause:
 		v.Complexity++
 	case *ast.BinaryExpr:
 		if n.Op == token.LAND || n.Op == token.LOR {
