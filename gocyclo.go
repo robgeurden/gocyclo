@@ -223,6 +223,7 @@ func (v *complexityVisitor) Visit(n ast.Node) ast.Visitor {
 			var buf bytes.Buffer
 			printer.Fprint(&buf, v.fSet, e.X)
 			x := buf.String()
+			buf.Reset()
 			printer.Fprint(&buf, v.fSet, e.Y)
 			y := buf.String()
 			if x != "err"{
