@@ -11,22 +11,30 @@ import (
 func Test_writeStats_ignores_vendor_packages(t *testing.T){
 	//Arrange
 	*novendor = true
-	sortedStats:= []stat{
+	var sortedStats = []stat{
 		{
 			PkgName:    "Ignored",
-			FuncName:   "vendor/a/b/c.go",
+			FuncName:   "TestFunction",
 			Complexity: 1,
-			Pos:        token.Position{},
+			Pos:        token.Position{
+				Filename: "vendor\\blaat.com\\functions",
+				Offset:   0,
+				Line:     0,
+				Column:   0,
+			},
 		},
 		{
 			PkgName:    "NotIgnored",
-			FuncName:   "g/c.go",
+			FuncName:   "TestFunction",
 			Complexity: 1,
-			Pos:        token.Position{},
+			Pos:        token.Position{
+				Filename: "blaat.com\\functions",
+				Offset:   0,
+				Line:     0,
+				Column:   0,
+			},
 		},
-	}
-
-	//Act
+	} //Act
 	w := &bytes.Buffer{}
 	result := writeStats(w, sortedStats)
 

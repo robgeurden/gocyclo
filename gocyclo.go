@@ -129,7 +129,7 @@ func analyzeDir(dirname string, stats []stat) []stat {
 func writeStats(w io.Writer, sortedStats []stat) int {
 	//remove all vendor files when no vendor flag is set
 	if *novendor {
-		 linq.From(sortedStats).WhereT(func(s stat) bool {return !strings.Contains(s.FuncName, "vendor")}).ToSlice(&sortedStats)
+		 linq.From(sortedStats).WhereT(func(s stat) bool {return !strings.Contains(s.Pos.Filename, "vendor")}).ToSlice(&sortedStats)
 	}
 
 	for i, stat := range sortedStats {
@@ -164,8 +164,7 @@ type stat struct {
 }
 
 func (s stat) String() string {
-	return fmt.Sprintf("%s",s.Pos)
-	//return fmt.Sprintf("%d %s %s %s", s.Complexity, s.PkgName, s.FuncName, s.Pos)
+	return fmt.Sprintf("%d %s %s %s", s.Complexity, s.PkgName, s.FuncName, s.Pos)
 }
 
 type byComplexity []stat
