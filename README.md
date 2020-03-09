@@ -1,4 +1,6 @@
 Gocyclo calculates cyclomatic complexities of functions in Go source code.
+This version has the option to ignore error handling due to the error
+handling syntax in Go.
 
 The cyclomatic complexity of a function is calculated according to the
 following rules:
