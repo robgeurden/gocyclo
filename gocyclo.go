@@ -164,7 +164,8 @@ type stat struct {
 }
 
 func (s stat) String() string {
-	return fmt.Sprintf("%d %s %s %s", s.Complexity, s.PkgName, s.FuncName, s.Pos)
+	return fmt.Sprintf("%s",s.FuncName)
+	//return fmt.Sprintf("%d %s %s %s", s.Complexity, s.PkgName, s.FuncName, s.Pos)
 }
 
 type byComplexity []stat
