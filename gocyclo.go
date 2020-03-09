@@ -60,7 +60,7 @@ var (
 	over = flag.Int("over", 0, "show functions with complexity > N only")
 	top  = flag.Int("top", -1, "show the top N most complex functions only")
 	avg  = flag.Bool("avg", false, "show the average complexity")
-	noerror = flag.Bool("noError", false, "ignore if err != nil when calculating complexity")
+	noerror = flag.Bool("noerror", false, "ignore if err != nil when calculating complexity")
 )
 
 func main() {
